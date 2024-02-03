@@ -1,0 +1,186 @@
+﻿<div id="tableBlock"></div>
+<div id="createBlock">
+    <p><b>Данные о квартире</b></p>
+    <table>
+        <tr><td><label>ID: </label></td><td><input type="number" id="Id" /></td></tr>
+        <tr><td><label>Количкство комнат: </label></td><td><input type="number" id="CountRooms" /></td></tr>
+        <tr><td><label>Ссылка: </label></td><td><input type="text" id="Link" /></td></tr>
+        <tr><td><label>Площадь: </label></td><td><input type="number" step="0.01" id="Area" /></td></tr>
+        <tr><td><label>Цена: </label></td><td><input type="number" step="0.01" id="Price" /></td></tr>
+    </table>
+    <button id="addFlat">Добавить</button>
+    <button id="editFlat">Изменить</button>
+</div>
+<script src="https://yastatic.net/jquery/3.3.1/jquery.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            GetAllFlats();
+
+            $("#editFlat").click(function (event) {
+                event.preventDefault();
+                EditFlat();
+            });
+
+            $("#addFlat").click(function (event) {
+                event.preventDefault();
+                AddFlat();
+            });
+
+        });
+
+        function GetAllFlats() {
+
+            $.ajax({
+                url: '/api/Flats',
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    WriteResponse(data);
+                },
+                error: function (x, y, z) {
+                    alert(x + '\n' + y + '\n' + z);
+                }
+            });
+        }
+
+        function AddFlat() {
+            var flat = {
+                Id: $('#Id').val(),
+                CountRooms: $('#CountRooms').val(),
+                Link: $('#Link').val(),
+                Area: $('#Area').val().toString().replace(".", ","),
+                Price: $('#Price').val().toString().replace(".", ",")
+            };
+
+            $.ajax({
+                url: '/api/Flats',
+                type: 'POST',
+                data: flat,
+                success: function (data) {
+                    GetAllFlats();
+                },
+                error: function (x, y, z) {
+                    alert(x + '\n' + y + '\n' + z);
+                }
+            });
+        }
+
+        function DeleteFlat(id) {
+
+            $.ajax({
+                url: '/api/Flats/' + id,
+                type: 'DELETE',
+                contentType: "application/json;charset=utf-8",
+                success: function (data) {
+                    GetAllFlats();
+                },
+                error: function (x, y, z) {
+                    alert(x + '\n' + y + '\n' + z);
+                }
+            });
+        }
+
+        function EditFlat() {
+            var flat = {
+            Id: $('#Id').val(),
+            CountRooms: $('#CountRooms').val(),
+            Link: $('#Link').val(),
+            Area: $('#Area').val().toString().replace(".", ","),
+            Price: $('#Price').val().toString().replace(".", ",")
+            };
+
+            $.ajax({
+                url: '/api/Flats',
+                type: 'PUT',
+                data: flat,
+                success: function (data) {
+                    GetAllFlats();
+                },
+                error: function (x, y, z) {
+                    alert(x + '\n' + y + '\n' + z);
+                }
+            });
+        }
+
+        function WriteResponse(flats) {
+            var strResult = "<table><th>ID</th><th>Количество комнат</th><th>Ссылка</th><th>Площадь</th><th>Цена</th><th>Дата</th>";
+            $.each(flats, function (index, flat) {
+                strResult += "<tr><td>" + flat.id 
+                + "</td><td> " + flat.countRooms 
+                + "</td><td>" + flat.link 
+                + "</td><td>" + flat.area
+                + "</td><td>" + flat.price
+                + "</td><td>" + flat.date +
+                    "</td><td><a id='editItem' data-item='" + flat.id + "' onclick='EditItem(this);' >Редактировать</a></td>" +
+                    "<td><a id='delItem' data-item='" + flat.id + "' onclick='DeleteItem(this);' >Удалить</a></td></tr>";
+            });
+            strResult += "</table>";
+            $("#tableBlock").html(strResult);
+        }
+
+        function DeleteItem(el) {
+            var id = $(el).attr('data-item');
+            DeleteFlat(id);
+        }
+
+        function EditItem(el) {
+            var id = $(el).attr('data-item');
+            GetFlat(id);
+        }
+
+        function ShowFlat(flat) {
+            if (flat != null) {
+                $('#Id').val(flat.id);
+                $('#CountRooms').val(flat.countRooms);
+                $('#Link').val(flat.link);
+                $('#Area').val(flat.area);
+                $('#Price').val(flat.price);
+            }
+            else {
+                alert("Такая книга не существует");
+            }
+        }
+
+        function GetFlat(id) {
+            $.ajax({
+                url: '/api/Flats/' + id,
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    ShowFlat(data);
+                },
+                error: function (x, y, z) {
+                    alert(x + '\n' + y + '\n' + z);
+                }
+            });
+        }
+    </script>
+
+    <style>
+        div {
+            display: inline-block;
+            margin: 20px;
+        }
+        td {
+            text-align: center;
+        }
+
+        table {
+            border-collapse: separate;
+            border-spacing: 5px;
+        }
+
+        #tableBlock {
+            width: auto;
+        }
+
+        #editBlock {
+            display: none;
+            float: right;
+        }
+
+        #createBlock {
+            float: right;
+        }
+    </style>

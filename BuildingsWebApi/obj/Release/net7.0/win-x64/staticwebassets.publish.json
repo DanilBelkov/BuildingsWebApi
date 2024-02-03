@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "4I4PtUh09pr5/9AiYnRnyfrZQ096oSfuUvFbNJVKWGE=",
+  "Source": "BuildingsWebApi",
+  "BasePath": "_content/BuildingsWebApi",
+  "Mode": "Default",
+  "ManifestType": "Publish",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
